@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎂 Make a Wish</title>
+    <title>🎂 A Special Wish</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             margin: 0; background: #0f172a;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; overflow: hidden; touch-action: none; font-family: sans-serif;
+            height: 100vh; overflow: hidden; touch-action: none; font-family: 'Segoe UI', sans-serif;
         }
         .cake-stage { position: relative; width: 300px; height: 300px; }
         .hotspot-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
@@ -27,11 +28,12 @@
         .out .flame { display: none; }
         .out .candle-body { fill: #475569 !important; opacity: 0.5; }
 
-        .controls { display: flex; gap: 10px; margin-top: 30px; z-index: 1100; }
-        .btn {
-            padding: 15px 25px; border-radius: 40px; border: none;
-            color: white; font-size: 16px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        /* 按钮放到角落 */
+        .corner-controls { position: fixed; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 1100; }
+        .btn-circle {
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            color: white; font-size: 20px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;
         }
         #micBtn { background: #ef4444; }
         #musicBtn { background: #3b82f6; }
@@ -66,19 +68,19 @@
         </svg>
     </div>
 
-    <div class="controls">
-        <button class="btn" id="micBtn">🎤 Enable Blow</button>
-        <button class="btn" id="musicBtn" onclick="toggleMusic()">🎵 Play Music</button>
+    <div class="corner-controls">
+        <button class="btn-circle" id="micBtn" title="Microphone">🎤</button>
+        <button class="btn-circle" id="musicBtn" onclick="toggleMusic()" title="Music">🎵</button>
     </div>
 
     <div id="wish">
         <h1 style="font-size: 50px; margin:0;">🎂</h1>
         <h2>Happy Birthday!</h2>
         <p id="blessingText"></p>
-        <button onclick="location.reload()" style="padding:10px 20px; margin-top: 20px; cursor: pointer;">Start Over</button>
+        <button onclick="location.reload()" style="padding:10px 20px; margin-top: 20px; cursor: pointer; border-radius: 10px; border: 1px solid #ccc;">Start Over</button>
     </div>
 
-    <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"></audio>
 
     <script>
         const blessings = [
@@ -96,10 +98,10 @@
         function toggleMusic() {
             if (audio.paused) { 
                 audio.play(); 
-                document.getElementById('musicBtn').innerText = "⏸ Pause Music"; 
+                document.getElementById('musicBtn').innerText = "⏸"; 
             } else { 
                 audio.pause(); 
-                document.getElementById('musicBtn').innerText = "🎵 Play Music"; 
+                document.getElementById('musicBtn').innerText = "🎵"; 
             }
         }
 
@@ -110,10 +112,17 @@
                 count++;
                 if(x && y) spawnSmoke(x, y);
                 if (count === total) {
-                    // Set a random blessing
+                    // 触发彩带
+                    confetti({
+                        particleCount: 150,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff9f43', '#a29bfe']
+                    });
+
                     const randomMsg = blessings[Math.floor(Math.random() * blessings.length)];
                     document.getElementById('blessingText').innerText = randomMsg;
-                    setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 500);
+                    setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 600);
                 }
             }
         }
@@ -144,8 +153,8 @@
                 const source = ctx.createMediaStreamSource(stream);
                 analyser.fftSize = 256;
                 source.connect(analyser);
-                this.innerText = "💨 Listening...";
                 this.style.background = "#22c55e";
+                this.innerText = "💨";
                 const data = new Uint8Array(analyser.frequencyBinCount);
                 const loop = () => {
                     analyser.getByteFrequencyData(data);
@@ -161,7 +170,7 @@
                     if(count < total) requestAnimationFrame(loop);
                 };
                 loop();
-            } catch (err) { alert("Please grant microphone access. Ensure you are using HTTPS."); }
+            } catch (err) { alert("Mic access required for blowing."); }
         };
     </script>
 </body>
