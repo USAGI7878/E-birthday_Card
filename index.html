@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎂 O2 CHALLENGE: DON'T STOP!</title>
+    <title>🎂 O2 CHALLENGE: CURSIVE EDITION</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        /* 设置全局 Cursive 字体 */
         body {
             margin: 0; background: #020617;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; overflow: hidden; touch-action: none; font-family: 'Courier New', Courier, monospace;
+            height: 100vh; overflow: hidden; touch-action: none;
+            font-family: "Brush Script MT", "Brush Script Std", "Lucida Handwriting", cursive;
         }
 
-        /* 氧气条容器 */
+        /* 氧气条 */
         #o2-container {
             position: fixed; top: 10%; width: 80%; height: 20px;
             background: #1e293b; border-radius: 10px; border: 2px solid #64748b; overflow: hidden;
@@ -21,11 +23,28 @@
             width: 100%; height: 100%; background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
             transition: width 0.1s linear;
         }
-        #o2-label { color: white; position: absolute; top: -25px; left: 0; font-size: 14px; font-weight: bold; }
+        #o2-label { 
+            color: white; position: absolute; top: -35px; left: 0; 
+            font-size: 24px; letter-spacing: 1px;
+        }
 
+        /* 动态提示语 */
         #status-tip {
-            position: fixed; top: 18%; width: 100%; text-align: center;
-            color: #fbbf24; font-size: 18px; font-weight: bold; z-index: 1500;
+            position: fixed; top: 20%; width: 100%; text-align: center;
+            color: #fbbf24; font-size: 28px; z-index: 1500;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* 麦克风未开启时的警告样式 */
+        .warning-pulse {
+            animation: pulse 1.5s infinite;
+            color: #ef4444 !important;
+            font-weight: bold;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .cake-stage { position: relative; width: 300px; height: 300px; transition: transform 0.05s; }
@@ -40,10 +59,11 @@
 
         .corner-controls { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 1100; }
         .btn-circle {
-            width: 60px; height: 60px; border-radius: 50%; border: none;
-            color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 65px; height: 65px; border-radius: 50%; border: none;
+            color: white; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
-        #micBtn { background: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        #micBtn { background: #ef4444; }
         #musicBtn { background: #3b82f6; }
 
         #wish {
@@ -51,16 +71,18 @@
             background: white; padding: 40px; border-radius: 30px; text-align: center;
             display: none; z-index: 3000; box-shadow: 0 0 100px rgba(0,0,0,0.8); width: 85%;
         }
+        #wish h2 { font-size: 40px; color: #ef4444; margin: 10px 0; }
+        #wish p { font-size: 26px; line-height: 1.4; color: #334155; }
     </style>
 </head>
 <body>
 
     <div id="o2-container">
-        <div id="o2-label">OXYGEN LEVEL: 100%</div>
+        <div id="o2-label">Oxygen Level: 100%</div>
         <div id="o2-bar"></div>
     </div>
 
-    <div id="status-tip">GET READY TO BLOW!</div>
+    <div id="status-tip" class="warning-pulse">Tap the 🎤 to enable blowing!</div>
 
     <div class="cake-stage" id="cake">
         <div class="hotspot-layer">
@@ -88,10 +110,10 @@
     </div>
 
     <div id="wish">
-        <h1 id="wish-icon">🎁</h1>
-        <h2 id="wish-title">Surprise!</h2>
+        <h1 id="wish-icon" style="font-size: 60px; margin:0;">🎁</h1>
+        <h2 id="wish-title">Happy Birthday!</h2>
         <p id="blessingText"></p>
-        <button onclick="location.reload()" style="padding:12px 24px; margin-top: 20px; cursor: pointer; border-radius: 12px; background: #3b82f6; color: white; border: none;">RETRY CHALLENGE</button>
+        <button onclick="location.reload()" style="padding:10px 20px; margin-top: 20px; cursor: pointer; border-radius: 12px; font-family: inherit; font-size: 20px;">Try Again</button>
     </div>
 
     <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"></audio>
@@ -109,6 +131,7 @@
         let count = 0;
         let o2 = 100;
         let isGameOver = false;
+        let micEnabled = false;
         const total = 5;
         const tip = document.getElementById('status-tip');
         const o2Bar = document.getElementById('o2-bar');
@@ -123,47 +146,48 @@
 
         function blowOut(idx) {
             if(isGameOver) return;
+            // 如果没开麦克风，点击蜡烛也无效（增强互动逻辑）
+            if(!micEnabled) {
+                tip.classList.add('warning-pulse');
+                tip.innerText = "Please enable Mic first! 🎤";
+                return;
+            }
             const candle = document.getElementById('candle-' + idx);
             if (candle && !candle.classList.contains('out')) {
                 candle.classList.add('out');
                 count++;
 
-                // 搞怪复燃机制
                 if (count < 4 && Math.random() > 0.8) {
                     setTimeout(() => {
                         if(isGameOver) return;
                         candle.classList.remove('out');
                         count--;
-                        tip.innerText = "🔥 OOPS! IT'S BACK!";
+                        tip.innerText = "Oh no! It's back! 🔥";
                     }, 1200);
                 }
 
-                if (count === total) {
-                    win();
-                }
+                if (count === total) win();
             }
         }
 
         function win() {
             isGameOver = true;
             document.getElementById('horn-sfx').play();
-            confetti({ particleCount: 250, spread: 90, origin: { y: 0.7 } });
-            tip.innerText = "🏆 CHALLENGE COMPLETE!";
+            confetti({ particleCount: 200, spread: 80, origin: { y: 0.7 } });
+            tip.innerText = "Challenge Complete! 🏆";
             document.getElementById('blessingText').innerText = blessings[Math.floor(Math.random() * blessings.length)];
             setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 600);
         }
 
         function gameOver() {
             isGameOver = true;
-            tip.innerText = "💀 OUT OF OXYGEN!";
-            tip.style.color = "#ef4444";
-            document.getElementById('wish-icon').innerText = "😵";
-            document.getElementById('wish-title').innerText = "FAILED!";
-            document.getElementById('blessingText').innerText = "You ran out of air! Try to be more efficient next time.";
+            tip.innerText = "Out of Breath! 😵";
+            document.getElementById('wish-icon').innerText = "💨";
+            document.getElementById('wish-title').innerText = "Challenge Failed!";
+            document.getElementById('blessingText').innerText = "The candles were too stubborn!";
             document.getElementById('wish').style.display = 'block';
         }
 
-        // 统一点击处理
         document.querySelectorAll('.hitbox').forEach(box => {
             box.addEventListener('mousedown', () => blowOut(box.dataset.idx));
             box.addEventListener('touchstart', (e) => { e.preventDefault(); blowOut(box.dataset.idx); });
@@ -175,9 +199,13 @@
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const analyser = ctx.createAnalyser();
                 ctx.createMediaStreamSource(stream).connect(analyser);
-                this.style.background = "#22c55e";
-                this.style.boxShadow = "0 0 30px #22c55e";
                 
+                micEnabled = true; // 开启授权标志
+                this.style.background = "#22c55e";
+                this.style.boxShadow = "0 0 20px #22c55e";
+                tip.classList.remove('warning-pulse');
+                tip.innerText = "Blowing Mode Active! 💨";
+
                 const data = new Uint8Array(analyser.frequencyBinCount);
                 const loop = () => {
                     if(isGameOver) return;
@@ -185,28 +213,23 @@
                     let vol = data.reduce((a, b) => a + b) / data.length;
                     
                     if (vol > 15) {
-                        // 消耗氧气：声音越大消耗越快
-                        o2 -= (vol / 100);
+                        o2 -= (vol / 90);
                         if (o2 <= 0) { o2 = 0; gameOver(); }
-                        
                         o2Bar.style.width = o2 + "%";
-                        o2Label.innerText = `OXYGEN LEVEL: ${Math.floor(o2)}%`;
-                        
-                        // 震动效果
+                        o2Label.innerText = `Oxygen Level: ${Math.floor(o2)}%`;
                         cake.style.transform = `translate(${Math.random()*vol/8}px, ${Math.random()*vol/8}px)`;
-                        tip.innerText = "💨 BLOWING!!!";
                     }
 
                     if (vol > 55) {
                         const alive = [0,1,2,3,4].filter(i => !document.getElementById('candle-'+i).classList.contains('out'));
-                        if (alive.length > 0) {
-                            blowOut(alive[Math.floor(Math.random()*alive.length)]);
-                        }
+                        if (alive.length > 0) blowOut(alive[Math.floor(Math.random()*alive.length)]);
                     }
                     requestAnimationFrame(loop);
                 };
                 loop();
-            } catch (err) { alert("Mic required!"); }
+            } catch (err) { 
+                tip.innerText = "Mic Error! Please allow access. ❌"; 
+            }
         };
     </script>
 </body>
