@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎂 Don't Blow Too Hard!</title>
+    <title>🎂 O2 CHALLENGE: DON'T STOP!</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
-            margin: 0; background: #0f172a;
+            margin: 0; background: #020617;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; overflow: hidden; touch-action: none; font-family: 'Courier New', Courier, monospace;
         }
 
-        /* 搞怪提示语放在中间顶部 */
+        /* 氧气条容器 */
+        #o2-container {
+            position: fixed; top: 10%; width: 80%; height: 20px;
+            background: #1e293b; border-radius: 10px; border: 2px solid #64748b; overflow: hidden;
+        }
+        #o2-bar {
+            width: 100%; height: 100%; background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+            transition: width 0.1s linear;
+        }
+        #o2-label { color: white; position: absolute; top: -25px; left: 0; font-size: 14px; font-weight: bold; }
+
         #status-tip {
-            position: fixed; top: 15%; width: 100%; text-align: center;
-            color: #fbbf24; font-size: 18px; font-weight: bold;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-            z-index: 1500; pointer-events: none;
-            transition: all 0.3s;
+            position: fixed; top: 18%; width: 100%; text-align: center;
+            color: #fbbf24; font-size: 18px; font-weight: bold; z-index: 1500;
         }
 
-        .cake-stage { position: relative; width: 300px; height: 300px; transition: transform 0.1s; }
+        .cake-stage { position: relative; width: 300px; height: 300px; transition: transform 0.05s; }
         .hotspot-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
         .hitbox { position: absolute; width: 60px; height: 120px; transform: translateX(-50%); -webkit-tap-highlight-color: transparent; }
         
-        .smoke {
-            position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.4);
-            border-radius: 50%; pointer-events: none; filter: blur(3px);
-            animation: puff 0.7s ease-out forwards; z-index: 2000;
-        }
-        @keyframes puff { to { transform: translateY(-100px) scale(4); opacity: 0; } }
-
         svg { width: 100%; height: 100%; pointer-events: none; }
         .flame { fill: #ff9d00; animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
         @keyframes flicker { from { transform: scale(1); } to { transform: scale(1.1); } }
@@ -41,12 +41,9 @@
         .corner-controls { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 1100; }
         .btn-circle {
             width: 60px; height: 60px; border-radius: 50%; border: none;
-            color: white; font-size: 24px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-            transition: transform 0.2s;
+            color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        .btn-circle:active { transform: scale(0.9); }
-        #micBtn { background: #ef4444; }
+        #micBtn { background: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
         #musicBtn { background: #3b82f6; }
 
         #wish {
@@ -58,7 +55,12 @@
 </head>
 <body>
 
-    <div id="status-tip">Ready to make a mess? Click the 🎤</div>
+    <div id="o2-container">
+        <div id="o2-label">OXYGEN LEVEL: 100%</div>
+        <div id="o2-bar"></div>
+    </div>
+
+    <div id="status-tip">GET READY TO BLOW!</div>
 
     <div class="cake-stage" id="cake">
         <div class="hotspot-layer">
@@ -72,11 +74,11 @@
         <svg viewBox="0 0 200 220">
             <rect x="20" y="140" width="160" height="60" rx="10" fill="#e67e22" />
             <rect x="40" y="90" width="120" height="50" rx="10" fill="#ffb347" />
-            <g id="candle-0" class="candle-group"><rect class="candle-body" x="55" y="60" width="8" height="30" fill="#FF6B6B" rx="2"/><path class="flame" d="M59 45 Q63 52 59 60 Q55 52 59 45" /></g>
-            <g id="candle-1" class="candle-group"><rect class="candle-body" x="78" y="55" width="8" height="35" fill="#4ECDC4" rx="2"/><path class="flame" d="M82 40 Q86 47 82 55 Q78 47 82 40" /></g>
-            <g id="candle-2" class="candle-group"><rect class="candle-body" x="96" y="50" width="8" height="40" fill="#FFE66D" rx="2"/><path class="flame" d="M100 35 Q104 42 100 50 Q96 42 100 35" /></g>
-            <g id="candle-3" class="candle-group"><rect class="candle-body" x="114" y="55" width="8" height="35" fill="#FF9F43" rx="2"/><path class="flame" d="M118 40 Q122 47 118 55 Q114 47 118 40" /></g>
-            <g id="candle-4" class="candle-group"><rect class="candle-body" x="137" y="60" width="8" height="30" fill="#A29BFE" rx="2"/><path class="flame" d="M141 45 Q145 52 141 60 Q137 52 141 45" /></g>
+            <g id="candle-0"><rect class="candle-body" x="55" y="60" width="8" height="30" fill="#FF6B6B" rx="2"/><path class="flame" d="M59 45 Q63 52 59 60 Q55 52 59 45" /></g>
+            <g id="candle-1"><rect class="candle-body" x="78" y="55" width="8" height="35" fill="#4ECDC4" rx="2"/><path class="flame" d="M82 40 Q86 47 82 55 Q78 47 82 40" /></g>
+            <g id="candle-2"><rect class="candle-body" x="96" y="50" width="8" height="40" fill="#FFE66D" rx="2"/><path class="flame" d="M100 35 Q104 42 100 50 Q96 42 100 35" /></g>
+            <g id="candle-3"><rect class="candle-body" x="114" y="55" width="8" height="35" fill="#FF9F43" rx="2"/><path class="flame" d="M118 40 Q122 47 118 55 Q114 47 118 40" /></g>
+            <g id="candle-4"><rect class="candle-body" x="137" y="60" width="8" height="30" fill="#A29BFE" rx="2"/><path class="flame" d="M141 45 Q145 52 141 60 Q137 52 141 45" /></g>
         </svg>
     </div>
 
@@ -86,13 +88,14 @@
     </div>
 
     <div id="wish">
-        <h1 style="font-size: 50px; margin:0;">🎁</h1>
-        <h2>Surprise!</h2>
+        <h1 id="wish-icon">🎁</h1>
+        <h2 id="wish-title">Surprise!</h2>
         <p id="blessingText"></p>
-        <button onclick="location.reload()" style="padding:12px 24px; margin-top: 20px; cursor: pointer; border-radius: 12px; background: #3b82f6; color: white; border: none;">Try Again</button>
+        <button onclick="location.reload()" style="padding:12px 24px; margin-top: 20px; cursor: pointer; border-radius: 12px; background: #3b82f6; color: white; border: none;">RETRY CHALLENGE</button>
     </div>
 
-    <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"></audio>
+    <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"></audio>
+    <audio id="horn-sfx" src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3"></audio>
 
     <script>
         const blessings = [
@@ -104,8 +107,12 @@
         ];
 
         let count = 0;
+        let o2 = 100;
+        let isGameOver = false;
         const total = 5;
         const tip = document.getElementById('status-tip');
+        const o2Bar = document.getElementById('o2-bar');
+        const o2Label = document.getElementById('o2-label');
         const cake = document.getElementById('cake');
 
         function toggleMusic() {
@@ -114,49 +121,53 @@
             else { audio.pause(); document.getElementById('musicBtn').innerText = "🎵"; }
         }
 
-        function blowOut(idx, x, y) {
+        function blowOut(idx) {
+            if(isGameOver) return;
             const candle = document.getElementById('candle-' + idx);
             if (candle && !candle.classList.contains('out')) {
                 candle.classList.add('out');
                 count++;
-                if(x && y) spawnSmoke(x, y);
 
-                // 搞怪机制：1/3 概率有一根蜡烛复燃 (仅在前三根熄灭时触发)
-                if (count < 4 && Math.random() > 0.7) {
+                // 搞怪复燃机制
+                if (count < 4 && Math.random() > 0.8) {
                     setTimeout(() => {
+                        if(isGameOver) return;
                         candle.classList.remove('out');
                         count--;
-                        tip.innerText = "💨 WAIT! IT'S BACK!";
-                        tip.style.color = "#ef4444";
-                    }, 1500);
+                        tip.innerText = "🔥 OOPS! IT'S BACK!";
+                    }, 1200);
                 }
 
                 if (count === total) {
-                    confetti({ particleCount: 200, spread: 80, origin: { y: 0.7 } });
-                    tip.innerText = "🎉 MISSION ACCOMPLISHED!";
-                    document.getElementById('blessingText').innerText = blessings[Math.floor(Math.random() * blessings.length)];
-                    setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 600);
+                    win();
                 }
             }
         }
 
+        function win() {
+            isGameOver = true;
+            document.getElementById('horn-sfx').play();
+            confetti({ particleCount: 250, spread: 90, origin: { y: 0.7 } });
+            tip.innerText = "🏆 CHALLENGE COMPLETE!";
+            document.getElementById('blessingText').innerText = blessings[Math.floor(Math.random() * blessings.length)];
+            setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 600);
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            tip.innerText = "💀 OUT OF OXYGEN!";
+            tip.style.color = "#ef4444";
+            document.getElementById('wish-icon').innerText = "😵";
+            document.getElementById('wish-title').innerText = "FAILED!";
+            document.getElementById('blessingText').innerText = "You ran out of air! Try to be more efficient next time.";
+            document.getElementById('wish').style.display = 'block';
+        }
+
         // 统一点击处理
         document.querySelectorAll('.hitbox').forEach(box => {
-            const act = (e) => {
-                const t = e.touches ? e.touches[0] : e;
-                blowOut(box.dataset.idx, t.clientX, t.clientY);
-            };
-            box.addEventListener('touchstart', act);
-            box.addEventListener('mousedown', act);
+            box.addEventListener('mousedown', () => blowOut(box.dataset.idx));
+            box.addEventListener('touchstart', (e) => { e.preventDefault(); blowOut(box.dataset.idx); });
         });
-
-        function spawnSmoke(x, y) {
-            const s = document.createElement('div');
-            s.className = 'smoke';
-            s.style.left = x + 'px'; s.style.top = y + 'px';
-            document.body.appendChild(s);
-            setTimeout(() => s.remove(), 700);
-        }
 
         document.getElementById('micBtn').onclick = async function() {
             try {
@@ -165,31 +176,37 @@
                 const analyser = ctx.createAnalyser();
                 ctx.createMediaStreamSource(stream).connect(analyser);
                 this.style.background = "#22c55e";
+                this.style.boxShadow = "0 0 30px #22c55e";
                 
                 const data = new Uint8Array(analyser.frequencyBinCount);
                 const loop = () => {
+                    if(isGameOver) return;
                     analyser.getByteFrequencyData(data);
                     let vol = data.reduce((a, b) => a + b) / data.length;
                     
-                    if (vol > 30) {
-                        tip.innerText = vol > 60 ? "WHOA! CHILL!" : "💨 BLOWING IN PROGRESS...";
-                        tip.style.color = vol > 60 ? "#ef4444" : "#fbbf24";
-                        // 蛋糕随声音震动
-                        cake.style.transform = `translate(${Math.random()*vol/10}px, ${Math.random()*vol/10}px)`;
+                    if (vol > 15) {
+                        // 消耗氧气：声音越大消耗越快
+                        o2 -= (vol / 100);
+                        if (o2 <= 0) { o2 = 0; gameOver(); }
+                        
+                        o2Bar.style.width = o2 + "%";
+                        o2Label.innerText = `OXYGEN LEVEL: ${Math.floor(o2)}%`;
+                        
+                        // 震动效果
+                        cake.style.transform = `translate(${Math.random()*vol/8}px, ${Math.random()*vol/8}px)`;
+                        tip.innerText = "💨 BLOWING!!!";
                     }
 
                     if (vol > 55) {
                         const alive = [0,1,2,3,4].filter(i => !document.getElementById('candle-'+i).classList.contains('out'));
                         if (alive.length > 0) {
-                            const id = alive[Math.floor(Math.random()*alive.length)];
-                            const b = document.querySelector(`[data-idx="${id}"]`).getBoundingClientRect();
-                            blowOut(id, b.left+30, b.top+20);
+                            blowOut(alive[Math.floor(Math.random()*alive.length)]);
                         }
                     }
                     requestAnimationFrame(loop);
                 };
                 loop();
-            } catch (err) { tip.innerText = "❌ Mic blocked!"; }
+            } catch (err) { alert("Mic required!"); }
         };
     </script>
 </body>
