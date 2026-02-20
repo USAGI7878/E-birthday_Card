@@ -3,99 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎂 O2 CHALLENGE: CURSIVE EDITION</title>
+    <title>🎂 THE ULTIMATE BLOW CHALLENGE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Spicy+Rice&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* 设置全局 Cursive 字体 */
         body {
             margin: 0; background: #020617;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; overflow: hidden; touch-action: none;
-            font-family: "Brush Script MT", "Brush Script Std", "Lucida Handwriting", cursive;
+            font-family: 'Spicy Rice', cursive; /* 使用搞怪字体 */
         }
 
-        /* 氧气条 */
+        /* 顶部氧气条 */
         #o2-container {
-            position: fixed; top: 10%; width: 80%; height: 20px;
-            background: #1e293b; border-radius: 10px; border: 2px solid #64748b; overflow: hidden;
+            position: fixed; top: 5%; width: 85%; height: 15px;
+            background: #1e293b; border-radius: 20px; border: 3px solid #64748b;
         }
-        #o2-bar {
-            width: 100%; height: 100%; background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
-            transition: width 0.1s linear;
-        }
-        #o2-label { 
-            color: white; position: absolute; top: -35px; left: 0; 
-            font-size: 24px; letter-spacing: 1px;
+        #o2-bar { width: 100%; height: 100%; background: #22c55e; transition: width 0.1s; }
+        #o2-label { color: #22c55e; position: absolute; top: -30px; left: 0; font-size: 20px; }
+
+        /* 实时吹气力度显示 */
+        #power-meter {
+            position: fixed; top: 15%; width: 85%; text-align: center;
+            color: #3b82f6; font-size: 24px; text-shadow: 2px 2px #000;
         }
 
-        /* 动态提示语 */
         #status-tip {
-            position: fixed; top: 20%; width: 100%; text-align: center;
-            color: #fbbf24; font-size: 28px; z-index: 1500;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            position: fixed; top: 22%; width: 100%; text-align: center;
+            color: #fbbf24; font-size: 32px; z-index: 1500;
+            transition: all 0.1s;
         }
 
-        /* 麦克风未开启时的警告样式 */
-        .warning-pulse {
-            animation: pulse 1.5s infinite;
-            color: #ef4444 !important;
-            font-weight: bold;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.05); }
-            100% { opacity: 1; transform: scale(1); }
+        /* 搞怪警告动画 */
+        .extreme-shake { animation: shake 0.1s infinite; color: #ff0000 !important; font-size: 45px !important; }
+        @keyframes shake {
+            0% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, -2px); }
+            100% { transform: translate(2px, -2px); }
         }
 
-        .cake-stage { position: relative; width: 300px; height: 300px; transition: transform 0.05s; }
-        .hotspot-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
-        .hitbox { position: absolute; width: 60px; height: 120px; transform: translateX(-50%); -webkit-tap-highlight-color: transparent; }
-        
+        .cake-stage { position: relative; width: 300px; height: 300px; }
         svg { width: 100%; height: 100%; pointer-events: none; }
         .flame { fill: #ff9d00; animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
-        @keyframes flicker { from { transform: scale(1); } to { transform: scale(1.1); } }
         .out .flame { display: none; }
         .out .candle-body { fill: #475569 !important; opacity: 0.5; }
 
+        /* 权限未开启时的遮罩 */
+        #mic-shield {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 2000; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+        }
+        .mic-warning { color: #ef4444; font-size: 30px; padding: 20px; animation: pulse 1s infinite; }
+
         .corner-controls { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 1100; }
         .btn-circle {
-            width: 65px; height: 65px; border-radius: 50%; border: none;
-            color: white; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            width: 70px; height: 70px; border-radius: 50%; border: 5px solid white;
+            color: white; font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        #micBtn { background: #ef4444; }
-        #musicBtn { background: #3b82f6; }
 
         #wish {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 40px; border-radius: 30px; text-align: center;
-            display: none; z-index: 3000; box-shadow: 0 0 100px rgba(0,0,0,0.8); width: 85%;
+            background: white; padding: 40px; border-radius: 40px; text-align: center;
+            display: none; z-index: 3000; box-shadow: 0 0 100px #000; width: 85%;
         }
-        #wish h2 { font-size: 40px; color: #ef4444; margin: 10px 0; }
-        #wish p { font-size: 26px; line-height: 1.4; color: #334155; }
+        #wish h2 { font-size: 45px; color: #ef4444; }
+        #wish p { font-size: 28px; color: #334155; line-height: 1.2; }
     </style>
 </head>
 <body>
 
+    <div id="mic-shield">
+        <div class="mic-warning">⚠️ SYSTEM LOCKED ⚠️<br>MIC PERMISSION REQUIRED!</div>
+        <p style="color: white; font-size: 18px;">Tap the Red Button Below to Unlock</p>
+    </div>
+
     <div id="o2-container">
-        <div id="o2-label">Oxygen Level: 100%</div>
+        <div id="o2-label">OXYGEN LEVEL</div>
         <div id="o2-bar"></div>
     </div>
 
-    <div id="status-tip" class="warning-pulse">Tap the 🎤 to enable blowing!</div>
+    <div id="power-meter">BLOW POWER: 0%</div>
+    <div id="status-tip">WATING FOR WIND...</div>
 
     <div class="cake-stage" id="cake">
-        <div class="hotspot-layer">
-            <div class="hitbox" style="left: 28%; top: 15%;" data-idx="0"></div>
-            <div class="hitbox" style="left: 39%; top: 10%;" data-idx="1"></div>
-            <div class="hitbox" style="left: 50%; top: 5%;" data-idx="2"></div>
-            <div class="hitbox" style="left: 61%; top: 10%;" data-idx="3"></div>
-            <div class="hitbox" style="left: 72%; top: 15%;" data-idx="4"></div>
-        </div>
-
         <svg viewBox="0 0 200 220">
-            <rect x="20" y="140" width="160" height="60" rx="10" fill="#e67e22" />
-            <rect x="40" y="90" width="120" height="50" rx="10" fill="#ffb347" />
+            <rect x="20" y="140" width="160" height="60" rx="15" fill="#e67e22" />
+            <rect x="40" y="90" width="120" height="50" rx="15" fill="#ffb347" />
             <g id="candle-0"><rect class="candle-body" x="55" y="60" width="8" height="30" fill="#FF6B6B" rx="2"/><path class="flame" d="M59 45 Q63 52 59 60 Q55 52 59 45" /></g>
             <g id="candle-1"><rect class="candle-body" x="78" y="55" width="8" height="35" fill="#4ECDC4" rx="2"/><path class="flame" d="M82 40 Q86 47 82 55 Q78 47 82 40" /></g>
             <g id="candle-2"><rect class="candle-body" x="96" y="50" width="8" height="40" fill="#FFE66D" rx="2"/><path class="flame" d="M100 35 Q104 42 100 50 Q96 42 100 35" /></g>
@@ -105,15 +99,15 @@
     </div>
 
     <div class="corner-controls">
-        <button class="btn-circle" id="micBtn">🎤</button>
-        <button class="btn-circle" id="musicBtn" onclick="toggleMusic()">🎵</button>
+        <button class="btn-circle" id="micBtn" style="background: #ef4444;">🎤</button>
+        <button class="btn-circle" id="musicBtn" onclick="toggleMusic()" style="background: #3b82f6;">🎵</button>
     </div>
 
     <div id="wish">
-        <h1 id="wish-icon" style="font-size: 60px; margin:0;">🎁</h1>
-        <h2 id="wish-title">Happy Birthday!</h2>
+        <h1 style="font-size: 70px; margin:0;">🎊</h1>
+        <h2 id="wish-title">HAPPY B-DAY!</h2>
         <p id="blessingText"></p>
-        <button onclick="location.reload()" style="padding:10px 20px; margin-top: 20px; cursor: pointer; border-radius: 12px; font-family: inherit; font-size: 20px;">Try Again</button>
+        <button onclick="location.reload()" style="padding:15px 30px; font-family: inherit; font-size: 25px; cursor:pointer; background:#22c55e; color:white; border:none; border-radius:15px;">PLAY AGAIN</button>
     </div>
 
     <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"></audio>
@@ -131,11 +125,8 @@
         let count = 0;
         let o2 = 100;
         let isGameOver = false;
-        let micEnabled = false;
-        const total = 5;
         const tip = document.getElementById('status-tip');
-        const o2Bar = document.getElementById('o2-bar');
-        const o2Label = document.getElementById('o2-label');
+        const powerLabel = document.getElementById('power-meter');
         const cake = document.getElementById('cake');
 
         function toggleMusic() {
@@ -146,52 +137,24 @@
 
         function blowOut(idx) {
             if(isGameOver) return;
-            // 如果没开麦克风，点击蜡烛也无效（增强互动逻辑）
-            if(!micEnabled) {
-                tip.classList.add('warning-pulse');
-                tip.innerText = "Please enable Mic first! 🎤";
-                return;
-            }
             const candle = document.getElementById('candle-' + idx);
             if (candle && !candle.classList.contains('out')) {
                 candle.classList.add('out');
                 count++;
-
-                if (count < 4 && Math.random() > 0.8) {
-                    setTimeout(() => {
-                        if(isGameOver) return;
-                        candle.classList.remove('out');
-                        count--;
-                        tip.innerText = "Oh no! It's back! 🔥";
-                    }, 1200);
+                if (count < 4 && Math.random() > 0.85) {
+                    setTimeout(() => { if(!isGameOver) { candle.classList.remove('out'); count--; tip.innerText = "IT CAME BACK! 🔥"; }}, 1000);
                 }
-
-                if (count === total) win();
+                if (count === 5) win();
             }
         }
 
         function win() {
             isGameOver = true;
             document.getElementById('horn-sfx').play();
-            confetti({ particleCount: 200, spread: 80, origin: { y: 0.7 } });
-            tip.innerText = "Challenge Complete! 🏆";
+            confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
             document.getElementById('blessingText').innerText = blessings[Math.floor(Math.random() * blessings.length)];
             setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 600);
         }
-
-        function gameOver() {
-            isGameOver = true;
-            tip.innerText = "Out of Breath! 😵";
-            document.getElementById('wish-icon').innerText = "💨";
-            document.getElementById('wish-title').innerText = "Challenge Failed!";
-            document.getElementById('blessingText').innerText = "The candles were too stubborn!";
-            document.getElementById('wish').style.display = 'block';
-        }
-
-        document.querySelectorAll('.hitbox').forEach(box => {
-            box.addEventListener('mousedown', () => blowOut(box.dataset.idx));
-            box.addEventListener('touchstart', (e) => { e.preventDefault(); blowOut(box.dataset.idx); });
-        });
 
         document.getElementById('micBtn').onclick = async function() {
             try {
@@ -200,36 +163,51 @@
                 const analyser = ctx.createAnalyser();
                 ctx.createMediaStreamSource(stream).connect(analyser);
                 
-                micEnabled = true; // 开启授权标志
-                this.style.background = "#22c55e";
-                this.style.boxShadow = "0 0 20px #22c55e";
-                tip.classList.remove('warning-pulse');
-                tip.innerText = "Blowing Mode Active! 💨";
-
+                document.getElementById('mic-shield').style.display = 'none'; // 解锁屏幕
+                this.style.boxShadow = "0 0 40px #22c55e";
+                
                 const data = new Uint8Array(analyser.frequencyBinCount);
                 const loop = () => {
                     if(isGameOver) return;
                     analyser.getByteFrequencyData(data);
                     let vol = data.reduce((a, b) => a + b) / data.length;
                     
-                    if (vol > 15) {
-                        o2 -= (vol / 90);
-                        if (o2 <= 0) { o2 = 0; gameOver(); }
-                        o2Bar.style.width = o2 + "%";
-                        o2Label.innerText = `Oxygen Level: ${Math.floor(o2)}%`;
-                        cake.style.transform = `translate(${Math.random()*vol/8}px, ${Math.random()*vol/8}px)`;
+                    // 1. 实时更新力度计
+                    let powerPercent = Math.min(100, Math.floor(vol * 1.5));
+                    powerLabel.innerText = `BLOW POWER: ${powerPercent}%`;
+                    powerLabel.style.color = vol > 50 ? '#ef4444' : '#3b82f6';
+
+                    if (vol > 10) {
+                        // 2. 氧气消耗
+                        o2 -= (vol / 110);
+                        if (o2 <= 0) { isGameOver = true; tip.innerText = "YOU FAINTED! 😵"; document.getElementById('wish').style.display = 'block'; document.getElementById('wish-title').innerText = "FAILED!"; }
+                        document.getElementById('o2-bar').style.width = o2 + "%";
+
+                        // 3. 搞怪提示与震动
+                        if (vol > 65) {
+                            tip.innerText = "CALM DOWN! 😡";
+                            tip.classList.add('extreme-shake');
+                            cake.style.transform = `scale(${1 + vol/200}) rotate(${Math.random()*10 - 5}deg)`;
+                        } else {
+                            tip.innerText = "KEEP BLOWING! 💨";
+                            tip.classList.remove('extreme-shake');
+                            cake.style.transform = `translate(${Math.random()*vol/5}px, ${Math.random()*vol/5}px)`;
+                        }
+                    } else {
+                        tip.innerText = "Too weak! Eat more cake! 🍰";
+                        tip.classList.remove('extreme-shake');
+                        cake.style.transform = "none";
                     }
 
-                    if (vol > 55) {
+                    // 4. 判定熄灭
+                    if (vol > 45) {
                         const alive = [0,1,2,3,4].filter(i => !document.getElementById('candle-'+i).classList.contains('out'));
                         if (alive.length > 0) blowOut(alive[Math.floor(Math.random()*alive.length)]);
                     }
                     requestAnimationFrame(loop);
                 };
                 loop();
-            } catch (err) { 
-                tip.innerText = "Mic Error! Please allow access. ❌"; 
-            }
+            } catch (err) { alert("Mic Access Denied!"); }
         };
     </script>
 </body>
