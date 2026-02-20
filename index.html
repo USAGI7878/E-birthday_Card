@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎂 THE ULTIMATE BLOW CHALLENGE</title>
+    <title>🎂 ULTIMATE BLOW CHALLENGE</title>
     <link href="https://fonts.googleapis.com/css2?family=Spicy+Rice&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -11,10 +11,10 @@
             margin: 0; background: #020617;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; overflow: hidden; touch-action: none;
-            font-family: 'Spicy Rice', cursive; /* 使用搞怪字体 */
+            font-family: 'Spicy Rice', cursive;
         }
 
-        /* 顶部氧气条 */
+        /* 氧气条 */
         #o2-container {
             position: fixed; top: 5%; width: 85%; height: 15px;
             background: #1e293b; border-radius: 20px; border: 3px solid #64748b;
@@ -22,7 +22,6 @@
         #o2-bar { width: 100%; height: 100%; background: #22c55e; transition: width 0.1s; }
         #o2-label { color: #22c55e; position: absolute; top: -30px; left: 0; font-size: 20px; }
 
-        /* 实时吹气力度显示 */
         #power-meter {
             position: fixed; top: 15%; width: 85%; text-align: center;
             color: #3b82f6; font-size: 24px; text-shadow: 2px 2px #000;
@@ -30,11 +29,9 @@
 
         #status-tip {
             position: fixed; top: 22%; width: 100%; text-align: center;
-            color: #fbbf24; font-size: 32px; z-index: 1500;
-            transition: all 0.1s;
+            color: #fbbf24; font-size: 32px; z-index: 10; transition: all 0.1s;
         }
 
-        /* 搞怪警告动画 */
         .extreme-shake { animation: shake 0.1s infinite; color: #ff0000 !important; font-size: 45px !important; }
         @keyframes shake {
             0% { transform: translate(2px, 2px); }
@@ -48,18 +45,28 @@
         .out .flame { display: none; }
         .out .candle-body { fill: #475569 !important; opacity: 0.5; }
 
-        /* 权限未开启时的遮罩 */
+        /* 修正后的权限遮罩：设置 pointer-events: none 确保不阻挡点击 */
         #mic-shield {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 2000; display: flex; flex-direction: column;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            z-index: 100; display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
+            pointer-events: none; /* 关键：让点击穿透到按钮上 */
         }
-        .mic-warning { color: #ef4444; font-size: 30px; padding: 20px; animation: pulse 1s infinite; }
+        .mic-warning { color: #ef4444; font-size: 35px; padding: 20px; animation: pulse 1s infinite; }
+        .arrow-down { font-size: 50px; color: white; margin-top: 20px; animation: bounce 1s infinite; }
+        
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        .corner-controls { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; z-index: 1100; }
+        .corner-controls { 
+            position: fixed; bottom: 30px; width: 100%; 
+            display: flex; justify-content: space-between; padding: 0 30px; 
+            box-sizing: border-box; z-index: 1000; /* 确保按钮在最上层 */
+        }
         .btn-circle {
-            width: 70px; height: 70px; border-radius: 50%; border: 5px solid white;
-            color: white; font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 75px; height: 75px; border-radius: 50%; border: 4px solid white;
+            color: white; font-size: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; /* 确保按钮可以被点击 */
         }
 
         #wish {
@@ -67,15 +74,14 @@
             background: white; padding: 40px; border-radius: 40px; text-align: center;
             display: none; z-index: 3000; box-shadow: 0 0 100px #000; width: 85%;
         }
-        #wish h2 { font-size: 45px; color: #ef4444; }
-        #wish p { font-size: 28px; color: #334155; line-height: 1.2; }
     </style>
 </head>
 <body>
 
     <div id="mic-shield">
-        <div class="mic-warning">⚠️ SYSTEM LOCKED ⚠️<br>MIC PERMISSION REQUIRED!</div>
-        <p style="color: white; font-size: 18px;">Tap the Red Button Below to Unlock</p>
+        <div class="mic-warning">⚠️ MIC LOCKED ⚠️<br>ACCESS REQUIRED</div>
+        <p style="color: white; font-size: 20px; margin-top: 10px;">The challenge awaits...</p>
+        <div class="arrow-down">↓</div>
     </div>
 
     <div id="o2-container">
@@ -107,7 +113,7 @@
         <h1 style="font-size: 70px; margin:0;">🎊</h1>
         <h2 id="wish-title">HAPPY B-DAY!</h2>
         <p id="blessingText"></p>
-        <button onclick="location.reload()" style="padding:15px 30px; font-family: inherit; font-size: 25px; cursor:pointer; background:#22c55e; color:white; border:none; border-radius:15px;">PLAY AGAIN</button>
+        <button onclick="location.reload()" style="padding:15px 30px; font-family: inherit; font-size: 25px; cursor:pointer; background:#22c55e; color:white; border:none; border-radius:15px;">RETRY</button>
     </div>
 
     <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"></audio>
@@ -163,7 +169,8 @@
                 const analyser = ctx.createAnalyser();
                 ctx.createMediaStreamSource(stream).connect(analyser);
                 
-                document.getElementById('mic-shield').style.display = 'none'; // 解锁屏幕
+                // 成功后移除遮罩
+                document.getElementById('mic-shield').style.display = 'none';
                 this.style.boxShadow = "0 0 40px #22c55e";
                 
                 const data = new Uint8Array(analyser.frequencyBinCount);
@@ -172,34 +179,34 @@
                     analyser.getByteFrequencyData(data);
                     let vol = data.reduce((a, b) => a + b) / data.length;
                     
-                    // 1. 实时更新力度计
                     let powerPercent = Math.min(100, Math.floor(vol * 1.5));
                     powerLabel.innerText = `BLOW POWER: ${powerPercent}%`;
-                    powerLabel.style.color = vol > 50 ? '#ef4444' : '#3b82f6';
 
                     if (vol > 10) {
-                        // 2. 氧气消耗
-                        o2 -= (vol / 110);
-                        if (o2 <= 0) { isGameOver = true; tip.innerText = "YOU FAINTED! 😵"; document.getElementById('wish').style.display = 'block'; document.getElementById('wish-title').innerText = "FAILED!"; }
+                        o2 -= (vol / 115);
+                        if (o2 <= 0) { 
+                            isGameOver = true; 
+                            document.getElementById('wish').style.display = 'block'; 
+                            document.getElementById('wish-title').innerText = "FAINTED! 😵";
+                            document.getElementById('blessingText').innerText = "You ran out of air! Try to be more efficient.";
+                        }
                         document.getElementById('o2-bar').style.width = o2 + "%";
 
-                        // 3. 搞怪提示与震动
                         if (vol > 65) {
-                            tip.innerText = "CALM DOWN! 😡";
+                            tip.innerText = "TOO LOUD! 😡";
                             tip.classList.add('extreme-shake');
-                            cake.style.transform = `scale(${1 + vol/200}) rotate(${Math.random()*10 - 5}deg)`;
+                            cake.style.transform = `scale(${1 + vol/220}) rotate(${Math.random()*10 - 5}deg)`;
                         } else {
                             tip.innerText = "KEEP BLOWING! 💨";
                             tip.classList.remove('extreme-shake');
                             cake.style.transform = `translate(${Math.random()*vol/5}px, ${Math.random()*vol/5}px)`;
                         }
                     } else {
-                        tip.innerText = "Too weak! Eat more cake! 🍰";
+                        tip.innerText = "BLOW HARDER! 🍰";
                         tip.classList.remove('extreme-shake');
                         cake.style.transform = "none";
                     }
 
-                    // 4. 判定熄灭
                     if (vol > 45) {
                         const alive = [0,1,2,3,4].filter(i => !document.getElementById('candle-'+i).classList.contains('out'));
                         if (alive.length > 0) blowOut(alive[Math.floor(Math.random()*alive.length)]);
@@ -207,7 +214,7 @@
                     requestAnimationFrame(loop);
                 };
                 loop();
-            } catch (err) { alert("Mic Access Denied!"); }
+            } catch (err) { alert("Please allow Mic access in browser settings!"); }
         };
     </script>
 </body>
