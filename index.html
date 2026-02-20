@@ -32,7 +32,6 @@
             color: #fbbf24; font-size: 32px; z-index: 10;
         }
 
-        /* 核心动画：极度抖动 */
         .extreme-shake { animation: shake 0.1s infinite; color: #ff0000 !important; font-size: 42px !important; }
         @keyframes shake {
             0% { transform: translate(2px, 2px); }
@@ -46,31 +45,40 @@
         .out .flame { display: none; }
         .out .candle-body { fill: #475569 !important; opacity: 0.5; }
 
-        /* 权限开启引导层 */
+        /* 引导层 */
         #mic-shield {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             z-index: 100; display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
-            pointer-events: none; /* 让点击能穿透到按钮 */
+            pointer-events: none;
         }
-        .mic-warning { color: #ef4444; font-size: 30px; padding: 20px; line-height: 1.2; }
+        .mic-warning { color: #ef4444; font-size: 30px; padding: 20px; }
         
-        /* 指向左下角的动态箭头 */
+        /* 修改为上下垂直移动的箭头 */
         .guide-arrow {
-            position: fixed; bottom: 110px; left: 40px;
-            font-size: 60px; color: #fbbf24;
-            transform: rotate(45deg);
-            animation: arrow-jump 0.8s infinite alternate;
-            z-index: 110; text-shadow: 0 0 15px #ef4444;
+            position: fixed; 
+            bottom: 120px; /* 位于麦克风上方 */
+            left: 45px;
+            font-size: 70px; 
+            color: #fbbf24;
+            animation: arrow-bounce 0.6s infinite alternate;
+            z-index: 110; 
+            text-shadow: 0 0 15px #ef4444;
         }
         .guide-text {
-            position: fixed; bottom: 160px; left: 30px;
-            color: white; font-size: 18px; width: 150px; text-align: left;
+            position: fixed; 
+            bottom: 190px; 
+            left: 30px;
+            color: white; 
+            font-size: 20px; 
+            width: 160px; 
+            text-align: center;
+            text-shadow: 1px 1px 2px black;
         }
 
-        @keyframes arrow-jump {
-            from { transform: rotate(45deg) translate(0, 0); }
-            to { transform: rotate(45deg) translate(-15px, 15px); }
+        @keyframes arrow-bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-30px); } /* 向上弹跳 30px */
         }
 
         .corner-controls { 
@@ -94,10 +102,9 @@
 <body>
 
     <div id="mic-shield">
-        <div class="mic-warning">CHALLENGE LOCKED!<br>ACTIVATE MIC TO START</div>
-        <div class="guide-text">TAP THIS BUTTON TO UNLOCK THE WIND!</div>
-        <div class="guide-arrow">↓</div>
-    </div>
+        <div class="mic-warning">CHALLENGE LOCKED!<br>TAP MIC BELOW</div>
+        <div class="guide-text">UNLOCK THE BREATH!</div>
+        <div class="guide-arrow">↓</div> </div>
 
     <div id="o2-container">
         <div id="o2-label">OXYGEN LEVEL</div>
@@ -171,7 +178,6 @@
                 const analyser = ctx.createAnalyser();
                 ctx.createMediaStreamSource(stream).connect(analyser);
                 
-                // 成功后移除所有遮罩和箭头
                 document.getElementById('mic-shield').style.display = 'none';
                 this.style.boxShadow = "0 0 40px #22c55e";
                 this.style.borderColor = "#22c55e";
@@ -186,12 +192,12 @@
                     powerLabel.innerText = `BLOW POWER: ${powerPercent}%`;
 
                     if (vol > 10) {
-                        o2 -= (vol / 120);
+                        o2 -= (vol / 125); // 稍微调慢了点点氧气消耗
                         if (o2 <= 0) { 
                             isGameOver = true; 
                             document.getElementById('wish').style.display = 'block'; 
                             document.getElementById('wish-title').innerText = "FAINTED! 😵";
-                            document.getElementById('blessingText').innerText = "You ran out of oxygen! Try to be faster!";
+                            document.getElementById('blessingText').innerText = "Too slow! You ran out of air!";
                         }
                         document.getElementById('o2-bar').style.width = o2 + "%";
 
@@ -222,7 +228,7 @@
                     requestAnimationFrame(loop);
                 };
                 loop();
-            } catch (err) { alert("Permission Denied! Check browser settings."); }
+            } catch (err) { alert("Mic locked! Check your browser settings."); }
         };
     </script>
 </body>
