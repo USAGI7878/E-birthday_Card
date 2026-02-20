@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎂 我的生日蛋糕</title>
+    <title>🎂 Make a Wish</title>
     <style>
         body {
             margin: 0; background: #0f172a;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; overflow: hidden; touch-action: none;
+            height: 100vh; overflow: hidden; touch-action: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .cake-stage { position: relative; width: 300px; height: 300px; }
+        .cake-stage { position: relative; width: 320px; height: 320px; }
 
-        /* 极简热区：放在最顶层，无遮挡 */
+        /* Interaction Layer */
         .hotspot-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1000;
@@ -22,11 +22,11 @@
         .hitbox {
             position: absolute; width: 60px; height: 120px;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0); /* 调试时可设为 0.1 */
+            background: rgba(255, 255, 255, 0); 
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 烟雾特效 */
+        /* Smoke Effect */
         .smoke {
             position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.4);
             border-radius: 50%; pointer-events: none; filter: blur(3px);
@@ -37,22 +37,34 @@
         }
 
         svg { width: 100%; height: 100%; pointer-events: none; }
+        
+        /* Flame Animation */
         .flame { fill: #ff9d00; animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
         @keyframes flicker { from { transform: scale(1); } to { transform: scale(1.1); } }
         .out .flame { display: none; }
         .out .candle-body { fill: #475569 !important; opacity: 0.5; }
 
+        /* UI Elements */
         .mic-btn {
             z-index: 1100; padding: 16px 32px; border-radius: 40px; border: none;
-            background: #ef4444; color: white; font-size: 18px; margin-top: 30px;
+            background: #ef4444; color: white; font-size: 16px; margin-top: 30px;
             font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-            cursor: pointer;
+            cursor: pointer; transition: background 0.3s;
         }
 
         #wish {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: white; padding: 40px; border-radius: 30px; text-align: center;
-            display: none; z-index: 3000; box-shadow: 0 0 100px rgba(0,0,0,0.8); width: 80%;
+            display: none; z-index: 3000; box-shadow: 0 0 100px rgba(0,0,0,0.8); width: 85%;
+            max-width: 400px;
+        }
+
+        #wish h2 { color: #ef4444; margin-bottom: 10px; }
+        #wish p { color: #334155; line-height: 1.6; font-size: 1.1em; font-style: italic; }
+        
+        .reset-btn {
+            margin-top: 20px; padding: 10px 20px; background: #f1f5f9;
+            border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer;
         }
     </style>
 </head>
@@ -67,46 +79,75 @@
             <div class="hitbox" style="left: 72%; top: 15%;" data-idx="4"></div>
         </div>
 
-        <svg viewBox="0 0 200 220">
-            <rect x="20" y="140" width="160" height="60" rx="10" fill="#e67e22" />
-            <rect x="40" y="90" width="120" height="50" rx="10" fill="#ffb347" />
-            <g id="candle-0" class="candle-group"><rect class="candle-body" x="55" y="60" width="8" height="30" fill="#FF6B6B" rx="2"/><path class="flame" d="M59 45 Q63 52 59 60 Q55 52 59 45" /></g>
-            <g id="candle-1" class="candle-group"><rect class="candle-body" x="78" y="55" width="8" height="35" fill="#4ECDC4" rx="2"/><path class="flame" d="M82 40 Q86 47 82 55 Q78 47 82 40" /></g>
-            <g id="candle-2" class="candle-group"><rect class="candle-body" x="96" y="50" width="8" height="40" fill="#FFE66D" rx="2"/><path class="flame" d="M100 35 Q104 42 100 50 Q96 42 100 35" /></g>
-            <g id="candle-3" class="candle-group"><rect class="candle-body" x="114" y="55" width="8" height="35" fill="#FF9F43" rx="2"/><path class="flame" d="M118 40 Q122 47 118 55 Q114 47 118 40" /></g>
-            <g id="candle-4" class="candle-group"><rect class="candle-body" x="137" y="60" width="8" height="30" fill="#A29BFE" rx="2"/><path class="flame" d="M141 45 Q145 52 141 60 Q137 52 141 45" /></g>
+        <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 20 Q50 0 100 20 T200 20" fill="none" stroke="#f472b6" stroke-width="3" stroke-dasharray="5,5" />
+            
+            <rect x="20" y="140" width="160" height="60" rx="10" fill="#fbcfe8" /> <path d="M20 145 Q25 135 30 145 T40 145 T50 145 T60 145 T70 145 T80 145 T90 145 T100 145 T110 145 T120 145 T130 145 T140 145 T150 145 T160 145 T170 145 T180 145" fill="#ffffff" /> <rect x="45" y="90" width="110" height="50" rx="10" fill="#fce7f3" />
+            
+            <circle cx="55" cy="90" r="8" fill="white" />
+            <circle cx="78" cy="85" r="8" fill="white" />
+            <circle cx="100" cy="82" r="8" fill="white" />
+            <circle cx="122" cy="85" r="8" fill="white" />
+            <circle cx="145" cy="90" r="8" fill="white" />
+
+            <g transform="translate(55, 82) scale(0.6)">
+                <path d="M0 0 Q-5 -10 0 -15 Q5 -10 0 0" fill="#ef4444" /> <path d="M-2 -12 L0 -15 L2 -12" fill="#22c55e" /> </g>
+            <g transform="translate(100, 74) scale(0.6)">
+                <path d="M0 0 Q-5 -10 0 -15 Q5 -10 0 0" fill="#ef4444" />
+                <path d="M-2 -12 L0 -15 L2 -12" fill="#22c55e" />
+            </g>
+            <g transform="translate(145, 82) scale(0.6)">
+                <path d="M0 0 Q-5 -10 0 -15 Q5 -10 0 0" fill="#ef4444" />
+                <path d="M-2 -12 L0 -15 L2 -12" fill="#22c55e" />
+            </g>
+            
+            <g id="candle-0" class="candle-group"><rect class="candle-body" x="55" y="60" width="8" height="25" fill="#FF6B6B" rx="2"/><path class="flame" d="M59 45 Q63 52 59 60 Q55 52 59 45" /></g>
+            <g id="candle-1" class="candle-group"><rect class="candle-body" x="78" y="55" width="8" height="30" fill="#4ECDC4" rx="2"/><path class="flame" d="M82 40 Q86 47 82 55 Q78 47 82 40" /></g>
+            <g id="candle-2" class="candle-group"><rect class="candle-body" x="96" y="50" width="8" height="35" fill="#FFE66D" rx="2"/><path class="flame" d="M100 35 Q104 42 100 50 Q96 42 100 35" /></g>
+            <g id="candle-3" class="candle-group"><rect class="candle-body" x="114" y="55" width="8" height="30" fill="#FF9F43" rx="2"/><path class="flame" d="M118 40 Q122 47 118 55 Q114 47 118 40" /></g>
+            <g id="candle-4" class="candle-group"><rect class="candle-body" x="137" y="60" width="8" height="25" fill="#A29BFE" rx="2"/><path class="flame" d="M141 45 Q145 52 141 60 Q137 52 141 45" /></g>
         </svg>
     </div>
 
-    <button class="mic-btn" id="micBtn">🎤 开启麦克风吹气</button>
+    <button class="mic-btn" id="micBtn">🎤 Enable Blow Mode</button>
 
     <div id="wish">
-        <h1 style="font-size: 50px; margin:0;">🎂</h1>
-        <h2>生日快乐！</h2>
-        <p>所有愿望都会成真 ✨</p>
-        <button onclick="location.reload()" style="padding:10px 20px; cursor:pointer;">再过一次</button>
+        <h1 style="font-size: 50px; margin:0;">✨</h1>
+        <h2>Happy Birthday!</h2>
+        <p id="blessingText"></p>
+        <button class="reset-btn" onclick="location.reload()">Start Over</button>
     </div>
 
     <script>
+        const blessings = [
+            "I don’t say this often, but I truly respect the way you move through life. Stay steady. Stay sharp. This year, take up more space — you’ve earned it.",
+            "I hope this year feels lighter for you. Less pressure, more clarity. And may you always remember — you’re stronger than you think.",
+            "This year, stop underestimating yourself. Go after what you want — seriously. I’d love to see you win.",
+            "Stay healthy. Stay grounded. Keep building the life you actually want.",
+            "I’m really grateful to have you in my life. You make things feel steadier than they would otherwise be. I hope this year brings you the kind of peace you give to others."
+        ];
+
         let count = 0;
         const total = 5;
 
-        // 统一吹灭逻辑
+        // Pick a random blessing on load
+        const randomBlessing = blessings[Math.floor(Math.random() * blessings.length)];
+        document.getElementById('blessingText').innerText = randomBlessing;
+
         function blowOut(idx, x, y) {
             const candle = document.getElementById('candle-' + idx);
             if (candle && !candle.classList.contains('out')) {
                 candle.classList.add('out');
                 count++;
                 if(x && y) {
-                    for(let i=0; i<4; i++) spawnSmoke(x, y);
+                    for(let i=0; i<5; i++) spawnSmoke(x, y);
                 }
                 if (count === total) {
-                    setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 500);
+                    setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 600);
                 }
             }
         }
 
-        // 强力监听点击和触摸
         document.querySelectorAll('.hitbox').forEach(box => {
             const act = (e) => {
                 e.preventDefault();
@@ -126,14 +167,11 @@
             setTimeout(() => s.remove(), 700);
         }
 
-        // 麦克风 - 针对 GitHub Pages/手机优化
         document.getElementById('micBtn').onclick = async function() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 const ctx = new AudioCtx();
-                
-                // 必须在点击内部 resume
                 await ctx.resume();
 
                 const analyser = ctx.createAnalyser();
@@ -141,7 +179,7 @@
                 analyser.fftSize = 256;
                 source.connect(analyser);
 
-                this.innerText = "💨 监听中... 用力吹！";
+                this.innerText = "💨 Listening... BLOW!";
                 this.style.background = "#22c55e";
 
                 const data = new Uint8Array(analyser.frequencyBinCount);
@@ -149,7 +187,7 @@
                     analyser.getByteFrequencyData(data);
                     let vol = data.reduce((a, b) => a + b) / data.length;
                     
-                    if (vol > 50) { 
+                    if (vol > 52) { 
                         const alive = [0,1,2,3,4].filter(i => !document.getElementById('candle-'+i).classList.contains('out'));
                         if (alive.length > 0) {
                             const id = alive[Math.floor(Math.random()*alive.length)];
@@ -161,7 +199,7 @@
                 };
                 loop();
             } catch (err) {
-                alert("请点击『允许』麦克风权限。如果使用的是手机自带浏览器，请确保链接是 https:// 开头的。");
+                alert("Please grant microphone access. Ensure you are using HTTPS.");
             }
         };
     </script>
