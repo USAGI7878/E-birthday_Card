@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎂 我的生日蛋糕</title>
+    <style>
+        body {
+            margin: 0; background: #0f172a;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden; touch-action: none;
+        }
+
+        .cake-stage { position: relative; width: 300px; height: 300px; }
+
+        /* 极简热区：放在最顶层，无遮挡 */
+        .hotspot-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1000;
+        }
+
+        .hitbox {
+            position: absolute; width: 60px; height: 120px;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0); /* 调试时可设为 0.1 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 烟雾特效 */
+        .smoke {
+            position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.4);
+            border-radius: 50%; pointer-events: none; filter: blur(3px);
+            animation: puff 0.7s ease-out forwards; z-index: 2000;
+        }
+        @keyframes puff {
+            to { transform: translateY(-100px) scale(4); opacity: 0; }
+        }
+
+        svg { width: 100%; height: 100%; pointer-events: none; }
+        .flame { fill: #ff9d00; animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
+        @keyframes flicker { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .out .flame { display: none; }
+        .out .candle-body { fill: #475569 !important; opacity: 0.5; }
+
+        .mic-btn {
+            z-index: 1100; padding: 16px 32px; border-radius: 40px; border: none;
+            background: #ef4444; color: white; font-size: 18px; margin-top: 30px;
+            font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            cursor: pointer;
+        }
+
+        #wish {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 40px; border-radius: 30px; text-align: center;
+            display: none; z-index: 3000; box-shadow: 0 0 100px rgba(0,0,0,0.8); width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cake-stage">
+        <div class="hotspot-layer" id="hotspots">
+            <div class="hitbox" style="left: 28%; top: 15%;" data-idx="0"></div>
+            <div class="hitbox" style="left: 39%; top: 10%;" data-idx="1"></div>
+            <div class="hitbox" style="left: 50%; top: 5%;" data-idx="2"></div>
+            <div class="hitbox" style="left: 61%; top: 10%;" data-idx="3"></div>
+            <div class="hitbox" style="left: 72%; top: 15%;" data-idx="4"></div>
+        </div>
+
+        <svg viewBox="0 0 200 220">
+            <rect x="20" y="140" width="160" height="60" rx="10" fill="#e67e22" />
+            <rect x="40" y="90" width="120" height="50" rx="10" fill="#ffb347" />
+            <g id="candle-0" class="candle-group"><rect class="candle-body" x="55" y="60" width="8" height="30" fill="#FF6B6B" rx="2"/><path class="flame" d="M59 45 Q63 52 59 60 Q55 52 59 45" /></g>
+            <g id="candle-1" class="candle-group"><rect class="candle-body" x="78" y="55" width="8" height="35" fill="#4ECDC4" rx="2"/><path class="flame" d="M82 40 Q86 47 82 55 Q78 47 82 40" /></g>
+            <g id="candle-2" class="candle-group"><rect class="candle-body" x="96" y="50" width="8" height="40" fill="#FFE66D" rx="2"/><path class="flame" d="M100 35 Q104 42 100 50 Q96 42 100 35" /></g>
+            <g id="candle-3" class="candle-group"><rect class="candle-body" x="114" y="55" width="8" height="35" fill="#FF9F43" rx="2"/><path class="flame" d="M118 40 Q122 47 118 55 Q114 47 118 40" /></g>
+            <g id="candle-4" class="candle-group"><rect class="candle-body" x="137" y="60" width="8" height="30" fill="#A29BFE" rx="2"/><path class="flame" d="M141 45 Q145 52 141 60 Q137 52 141 45" /></g>
+        </svg>
+    </div>
+
+    <button class="mic-btn" id="micBtn">🎤 开启麦克风吹气</button>
+
+    <div id="wish">
+        <h1 style="font-size: 50px; margin:0;">🎂</h1>
+        <h2>生日快乐！</h2>
+        <p>所有愿望都会成真 ✨</p>
+        <button onclick="location.reload()" style="padding:10px 20px; cursor:pointer;">再过一次</button>
+    </div>
+
+    <script>
+        let count = 0;
+        const total = 5;
+
+        // 统一吹灭逻辑
+        function blowOut(idx, x, y) {
+            const candle = document.getElementById('candle-' + idx);
+            if (candle && !candle.classList.contains('out')) {
+                candle.classList.add('out');
+                count++;
+                if(x && y) {
+                    for(let i=0; i<4; i++) spawnSmoke(x, y);
+                }
+                if (count === total) {
+                    setTimeout(() => { document.getElementById('wish').style.display = 'block'; }, 500);
+                }
+            }
+        }
+
+        // 强力监听点击和触摸
+        document.querySelectorAll('.hitbox').forEach(box => {
+            const act = (e) => {
+                e.preventDefault();
+                const touch = e.touches ? e.touches[0] : e;
+                blowOut(box.dataset.idx, touch.clientX, touch.clientY);
+            };
+            box.addEventListener('touchstart', act, {passive: false});
+            box.addEventListener('mousedown', act);
+        });
+
+        function spawnSmoke(x, y) {
+            const s = document.createElement('div');
+            s.className = 'smoke';
+            s.style.left = x + (Math.random()*20-10) + 'px';
+            s.style.top = y + (Math.random()*20-10) + 'px';
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 700);
+        }
+
+        // 麦克风 - 针对 GitHub Pages/手机优化
+        document.getElementById('micBtn').onclick = async function() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                
+                // 必须在点击内部 resume
+                await ctx.resume();
+
+                const analyser = ctx.createAnalyser();
+                const source = ctx.createMediaStreamSource(stream);
+                analyser.fftSize = 256;
+                source.connect(analyser);
+
+                this.innerText = "💨 监听中... 用力吹！";
+                this.style.background = "#22c55e";
+
+                const data = new Uint8Array(analyser.frequencyBinCount);
+                const loop = () => {
+                    analyser.getByteFrequencyData(data);
+                    let vol = data.reduce((a, b) => a + b) / data.length;
+                    
+                    if (vol > 50) { 
+                        const alive = [0,1,2,3,4].filter(i => !document.getElementById('candle-'+i).classList.contains('out'));
+                        if (alive.length > 0) {
+                            const id = alive[Math.floor(Math.random()*alive.length)];
+                            const box = document.querySelector(`[data-idx="${id}"]`).getBoundingClientRect();
+                            blowOut(id, box.left + 30, box.top + 20);
+                        }
+                    }
+                    if(count < total) requestAnimationFrame(loop);
+                };
+                loop();
+            } catch (err) {
+                alert("请点击『允许』麦克风权限。如果使用的是手机自带浏览器，请确保链接是 https:// 开头的。");
+            }
+        };
+    </script>
+</body>
+</html>
